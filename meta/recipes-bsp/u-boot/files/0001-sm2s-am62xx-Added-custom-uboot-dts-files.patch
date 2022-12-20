@@ -1,23 +1,23 @@
-From a2e091ac54cdd96c8aa5b03f59623bce11a590bd Mon Sep 17 00:00:00 2001
+From 83cec1e8b5432a0215dcbb52729c936efc13332a Mon Sep 17 00:00:00 2001
 From: Maulik Manvar <maulik.manvar@softwebsolutions.com>
-Date: Mon, 19 Dec 2022 13:58:13 +0530
+Date: Mon, 19 Dec 2022 18:45:40 +0530
 Subject: [PATCH] sm2s-am62xx: Added custom uboot dts files
 
 Signed-off-by: Maulik Manvar <maulik.manvar@softwebsolutions.com>
 ---
- arch/arm/dts/Makefile                  |   5 +-
+ arch/arm/dts/Makefile                  |   6 +-
  arch/arm/dts/sm2s-am625x-rev1.dts      |  90 ++++++
  arch/arm/dts/sm2s-am62x-sk-common.dtsi | 429 +++++++++++++++++++++++++
  configs/am62x_evm_a53_defconfig        |   2 +-
- 4 files changed, 521 insertions(+), 5 deletions(-)
+ 4 files changed, 522 insertions(+), 5 deletions(-)
  create mode 100644 arch/arm/dts/sm2s-am625x-rev1.dts
  create mode 100644 arch/arm/dts/sm2s-am62x-sk-common.dtsi
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index b9b8cbcfaf..7d5a4831de 100644
+index b9b8cbcfaf..135a143dba 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -992,10 +992,7 @@ dtb-$(CONFIG_SOC_K3_AM642) += k3-am642-evm.dtb \
+@@ -992,10 +992,8 @@ dtb-$(CONFIG_SOC_K3_AM642) += k3-am642-evm.dtb \
  			      k3-am642-r5-sk.dtb \
  			      k3-am642-evm-nand.dtbo
  
@@ -25,7 +25,8 @@ index b9b8cbcfaf..7d5a4831de 100644
 -			      k3-am625-r5-sk.dtb \
 -			      k3-am62x-lp-sk.dtb \
 -			      k3-am62x-r5-lp-sk.dtb
-+dtb-$(CONFIG_SOC_K3_AM625) += sm2s-am625x-rev1.dtb
++dtb-$(CONFIG_SOC_K3_AM625) += sm2s-am625x-rev1.dtb \
++			      k3-am625-r5-sk.dtb
  
  dtb-$(CONFIG_ARCH_MEDIATEK) += \
  	mt7622-rfb.dtb \
