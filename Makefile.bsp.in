@@ -39,7 +39,12 @@ all:
 
 .PHONY: $(IMAGE_TYPES_FOR_WAYLAND)
 $(IMAGE_TYPES_FOR_WAYLAND):
-	@./build.sh bitbake ${BITBAKE_FLAGS} $@
+	bash ${CURRENT_DIR}/setenv.sh; \
+	export TOOLCHAIN_PATH_ARMV7=${TOOLCHAIN_PATHV7}; \
+	export TOOLCHAIN_PATH_ARMV8=${TOOLCHAIN_PATHV8}; \
+	export PATH=${PATH}; \
+	export BB_ENV_EXTRAWHITE=${BB_ENV_EXTRAWHITE}; \
+	bash build.sh bitbake ${BITBAKE_FLAGS} $@
 
 .PHONY: msc-sm2s-am6254-wayland
 msc-sm2s-am6254-wayland:
