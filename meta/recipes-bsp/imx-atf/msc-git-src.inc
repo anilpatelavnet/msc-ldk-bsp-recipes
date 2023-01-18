@@ -1,4 +1,0 @@
-# Copyright (C) 2021 AVNET Embedded, MSC Technologies GmbH
-
-GIT_PATH = "thirdparty/imx-atf.git"
-BRANCH = "msc-imx_5.10.35_2.0.0-develop"

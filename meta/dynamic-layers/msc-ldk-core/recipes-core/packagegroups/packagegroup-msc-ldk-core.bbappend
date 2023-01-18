@@ -1,6 +1,7 @@
-# Copyright (C) 2021 AVNET Embedded, MSC Technologies GmbH
+# Copyright (C) 2022 AVNET Embedded, MSC Technologies GmbH
 
 RDEPENDS_${PN}_remove += " \ 
 	eudev-hwdb \
 	eudev \
+	locale-base-en-us \
 	"
