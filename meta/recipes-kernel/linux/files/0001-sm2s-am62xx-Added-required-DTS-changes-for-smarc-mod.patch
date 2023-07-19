@@ -1,14 +1,14 @@
-From 653723eef8cec7edf3fda66d0b923340ec34085b Mon Sep 17 00:00:00 2001
+From 6b29dff7dbfc7a288b2c69b38371ed9eaadaeb9a Mon Sep 17 00:00:00 2001
 From: Anil Patel <anil.patel@softwebsolutions.com>
-Date: Fri, 14 Jul 2023 13:00:03 +0530
+Date: Wed, 19 Jul 2023 15:33:02 +0530
 Subject: [PATCH] sm2s-am62xx: Added required DTS changes for smarc module
 
 Signed-off-by: Anil Patel <anil.patel@softwebsolutions.com>
 ---
  arch/arm64/boot/dts/ti/Makefile               |    2 +
- arch/arm64/boot/dts/ti/sm2s-am625x-rev1.dts   |  189 +++
- .../arm64/boot/dts/ti/sm2s-am62xx-common.dtsi | 1243 +++++++++++++++++
- 3 files changed, 1434 insertions(+)
+ arch/arm64/boot/dts/ti/sm2s-am625x-rev1.dts   |  148 +++
+ .../arm64/boot/dts/ti/sm2s-am62xx-common.dtsi | 1144 +++++++++++++++++
+ 3 files changed, 1294 insertions(+)
  create mode 100644 arch/arm64/boot/dts/ti/sm2s-am625x-rev1.dts
  create mode 100644 arch/arm64/boot/dts/ti/sm2s-am62xx-common.dtsi
 
@@ -27,10 +27,10 @@ index adc62f1c1b3b..2c405058ca24 100644
  dtb-$(CONFIG_ARCH_K3) += k3-am625-skeleton.dtb
 diff --git a/arch/arm64/boot/dts/ti/sm2s-am625x-rev1.dts b/arch/arm64/boot/dts/ti/sm2s-am625x-rev1.dts
 new file mode 100644
-index 000000000000..4ca6c5b1549e
+index 000000000000..1f350a8090a3
 --- /dev/null
 +++ b/arch/arm64/boot/dts/ti/sm2s-am625x-rev1.dts
-@@ -0,0 +1,189 @@
+@@ -0,0 +1,148 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Taken ref from AM625 SK: https://www.ti.com/lit/zip/sprr448
@@ -165,9 +165,9 @@ index 000000000000..4ca6c5b1549e
 +};
 +
 +&ospi0 {
-+	flash@0 {
-+		compatible = "winbond,W25N01GV","spi-nand";
-+		reg = <0x0>;
++	flash@2 {
++		compatible = "winbond,W25N02JW","spi-nand";
++		reg = <0x2>;
 +		spi-tx-bus-width = <1>;
 +		spi-rx-bus-width = <4>;
 +		spi-max-frequency = <25000000>;
@@ -177,55 +177,14 @@ index 000000000000..4ca6c5b1549e
 +		cdns,tslch-ns = <60>;
 +		cdns,read-delay = <4>;
 +		cdns,phy-mode;
-+		gpios = <&mcu_gpio0 4 GPIO_ACTIVE_LOW>;
-+		partitions {
-+			compatible = "fixed-partitions";
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+
-+			partition@0 {
-+				label = "ospi.tiboot3";
-+				reg = <0x0 0x80000>;
-+			};
-+
-+			partition@80000 {
-+				label = "ospi.tispl";
-+				reg = <0x80000 0x200000>;
-+			};
-+
-+			partition@280000 {
-+				label = "ospi.u-boot";
-+				reg = <0x280000 0x400000>;
-+			};
-+
-+			partition@680000 {
-+				label = "ospi.env";
-+				reg = <0x680000 0x40000>;
-+			};
-+
-+			partition@6c0000 {
-+				label = "ospi.env.backup";
-+				reg = <0x6c0000 0x40000>;
-+			};
-+
-+			partition@800000 {
-+				label = "ospi.rootfs";
-+				reg = <0x800000 0x37c0000>;
-+			};
-+
-+			partition@3fc0000 {
-+				label = "ospi.phypattern";
-+				reg = <0x3fc0000 0x40000>;
-+			};
-+		};
 +	};
 +};
 diff --git a/arch/arm64/boot/dts/ti/sm2s-am62xx-common.dtsi b/arch/arm64/boot/dts/ti/sm2s-am62xx-common.dtsi
 new file mode 100644
-index 000000000000..80a2b150762e
+index 000000000000..bcb0c121b8ed
 --- /dev/null
 +++ b/arch/arm64/boot/dts/ti/sm2s-am62xx-common.dtsi
-@@ -0,0 +1,1243 @@
+@@ -0,0 +1,1144 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Common dtsi for sm2s-am6254
@@ -453,8 +412,8 @@ index 000000000000..80a2b150762e
 +                };
 +        };
 +
-+	/* DA codec
-+	sound {
++	/* DA codec */
++	bt-sound {
 +		compatible = "simple-audio-card";
 +		simple-audio-card,name = "sm2s-am62x";
 +		simple-audio-card,format = "i2s";
@@ -475,7 +434,7 @@ index 000000000000..80a2b150762e
 +
 +
 +		simple-audio-card,cpu {
-+			sound-dai = <&mcasp0>;
++			sound-dai = <&mcasp1>;
 +			bitclock-master;
 +			frame-master;
 +			system-clock-frequency = <12000000>;
@@ -486,7 +445,7 @@ index 000000000000..80a2b150762e
 +			sound-dai = <&da7213_codec>;
 +		};
 +	};
-+	*/
++
 +
 +	clk_ext_audio_codec: clock-codec {
 +		compatible = "fixed-clock";
@@ -667,6 +626,7 @@ index 000000000000..80a2b150762e
 +	ospi0_pins_default: ospi0-pins-default {
 +		pinctrl-single,pins = <
 +			AM62X_IOPAD(0x000, PIN_OUTPUT, 0) /* (H24) OSPI0_CLK */
++			AM62X_IOPAD(0x034, PIN_OUTPUT, 0) /* (H21) OSPI0_CSn2 */
 +			AM62X_IOPAD(0x00c, PIN_INPUT, 0) /* (E25) OSPI0_D0 */
 +			AM62X_IOPAD(0x010, PIN_INPUT, 0) /* (G24) OSPI0_D1 */
 +			AM62X_IOPAD(0x014, PIN_INPUT, 0) /* (F25) OSPI0_D2 */
@@ -754,7 +714,7 @@ index 000000000000..80a2b150762e
 +		pinctrl-single,pins = <
 +			AM62X_IOPAD(0x0020, PIN_OUTPUT, 1) /* (J25) OSPI0_D5.SPI1_CLK */
 +			AM62X_IOPAD(0x001c, PIN_OUTPUT, 1) /* (J23) OSPI0_D4.SPI1_CS0 */
-+			AM62X_IOPAD(0x0034, PIN_OUTPUT, 1) /* (H21) OSPI0_CSn2.SPI1_CS1 */
++			/*AM62X_IOPAD(0x0034, PIN_OUTPUT, 1)*/ /* USED in QSPI CS (H21) OSPI0_CSn2.SPI1_CS1 */
 +			AM62X_IOPAD(0x0024, PIN_INPUT, 1) /* (H25) OSPI0_D6.SPI1_D0 */
 +			AM62X_IOPAD(0x0028, PIN_INPUT, 1) /* (J22) OSPI0_D7.SPI1_D1 */
 +		>;
@@ -798,7 +758,7 @@ index 000000000000..80a2b150762e
 +			AM62X_IOPAD(0x0050, PIN_INPUT, 7) /* (P22) GPMC0_AD5.GPIO0_20 */
 +			AM62X_IOPAD(0x0054, PIN_INPUT, 7) /* (P21) GPMC0_AD6.GPIO0_21 */
 +			AM62X_IOPAD(0x0058, PIN_OUTPUT, 7) /* (R23) GPMC0_AD7.GPIO0_22 */
-+			AM62X_IOPAD(0x005c, PIN_INPUT, 7) /* (R24) GPMC0_AD8.GPIO0_23 */
++			AM62X_IOPAD(0x005c, PIN_OUTPUT, 7) /* (R24) GPMC0_AD8.GPIO0_23 */
 +			AM62X_IOPAD(0x0060, PIN_INPUT, 7) /* (R25) GPMC0_AD9.GPIO0_24 */
 +			AM62X_IOPAD(0x0064, PIN_INPUT, 7) /* (T25) GPMC0_AD10.GPIO0_25 */
 +			AM62X_IOPAD(0x0068, PIN_INPUT, 7) /* (R21) GPMC0_AD11.GPIO0_26 */
@@ -911,7 +871,7 @@ index 000000000000..80a2b150762e
 +	};
 +
 +
-+	/*da7213_codec: da7212@1a {
++	da7213_codec: da7212@1a {
 +		#sound-dai-cells = <0>;
 +		compatible = "dlg,da7213";
 +		reg = <0x1a>;
@@ -925,13 +885,13 @@ index 000000000000..80a2b150762e
 +		VDDMIC-supply= <&vcc_3v3_sys>;
 +		clocks = <&clk_ext_audio_codec>;
 +		clock-names = "mclk";
-+	};*/
++	};
 +
 +	tlv320aic3106: audio-codec@1b {
 +                #sound-dai-cells = <0>;
 +                compatible = "ti,tlv320aic3106";
 +                reg = <0x1b>;
-+                ai3x-micbias-vg = <1>;          /* 2.0V */
++                ai3x-micbias-vg = <1>;         /* 2.0V */
 +                status = "okay";
 +
 +                /* Regulators */
@@ -1240,35 +1200,10 @@ index 000000000000..80a2b150762e
 +	ti,pindir-d0-out-d1-in;
 +
 +	flash1@0 {
-+		spi-cs-high;
 +		compatible = "winbond,w25q64dw", "jedec,spi-nor";
 +		spi-max-frequency = <24000000>;
 +		m25p,fast-read;
 +		reg = <0>;
-+		partitions{
-+			compatible = "fixed-partitions";
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+			partition@0 {
-+				label = "u-boot-spl";
-+				reg = <0x0 0x80000>;
-+			};
-+
-+			partition@80000 {
-+                               label = "u-boot";
-+                               reg = <0x80000 0x100000>;
-+			};
-+
-+			partition@180000 {
-+				label = "u-boot-env";
-+				reg = <0x180000 0x20000>;
-+			};
-+
-+			partition@1A0000 {
-+				label = "misc";
-+				reg = <0x1A0000 0x660000>;
-+			};
-+		};
 +	};
 +
 +	flash2@1 {
@@ -1276,31 +1211,6 @@ index 000000000000..80a2b150762e
 +		spi-max-frequency = <24000000>;
 +		m25p,fast-read;
 +		reg = <1>;
-+		partitions{
-+			compatible = "fixed-partitions";
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+
-+			partition@0 {
-+				label = "u-boot-spl";
-+				reg = <0x0 0x80000>;
-+			};
-+
-+			partition@80000 {
-+				label = "u-boot";
-+				reg = <0x80000 0x100000>;
-+			};
-+
-+			partition@180000 {
-+				label = "u-boot-env";
-+				reg = <0x180000 0x20000>;
-+			};
-+
-+			partition@1A0000 {
-+				label = "misc";
-+				reg = <0x1A0000 0x660000>;
-+			};
-+		};
 +	};
 +};
 +
@@ -1312,35 +1222,10 @@ index 000000000000..80a2b150762e
 +	ti,pindir-d0-out-d1-in;
 +
 +	flash1@0 {
-+		spi-cs-high;
 +		compatible = "winbond,w25q64dw", "jedec,spi-nor";
 +		spi-max-frequency = <24000000>;
 +		m25p,fast-read;
 +		reg = <0>;
-+		partitions{
-+			compatible = "fixed-partitions";
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+			partition@0 {
-+				label = "u-boot-spl";
-+				reg = <0x0 0x80000>;
-+			};
-+
-+			partition@80000 {
-+                               label = "u-boot";
-+                               reg = <0x80000 0x100000>;
-+			};
-+
-+			partition@180000 {
-+				label = "u-boot-env";
-+				reg = <0x180000 0x20000>;
-+			};
-+
-+			partition@1A0000 {
-+				label = "misc";
-+				reg = <0x1A0000 0x660000>;
-+			};
-+		};
 +	};
 +
 +	flash2@1 {
@@ -1348,31 +1233,6 @@ index 000000000000..80a2b150762e
 +		spi-max-frequency = <24000000>;
 +		m25p,fast-read;
 +		reg = <1>;
-+		partitions{
-+			compatible = "fixed-partitions";
-+			#address-cells = <1>;
-+			#size-cells = <1>;
-+
-+			partition@0 {
-+				label = "u-boot-spl";
-+				reg = <0x0 0x80000>;
-+			};
-+
-+			partition@80000 {
-+				label = "u-boot";
-+				reg = <0x80000 0x100000>;
-+			};
-+
-+			partition@180000 {
-+				label = "u-boot-env";
-+				reg = <0x180000 0x20000>;
-+			};
-+
-+			partition@1A0000 {
-+				label = "misc";
-+				reg = <0x1A0000 0x660000>;
-+			};
-+		};
 +	};
 +};
 +
@@ -1470,5 +1330,5 @@ index 000000000000..80a2b150762e
 +        };
 +};
 -- 
-2.25.1
+2.17.1
 

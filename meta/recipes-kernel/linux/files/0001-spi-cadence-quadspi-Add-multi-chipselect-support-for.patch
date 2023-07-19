@@ -1,0 +1,50 @@
+From 444a988b47e625c0ad03458e1b8159c36ca68211 Mon Sep 17 00:00:00 2001
+From: Ramuthevar Vadivel Murugan <vadivel.muruganx.ramuthevar@linux.intel.com>
+Date: Tue, 24 Nov 2020 12:18:38 +0800
+Subject: [PATCH] spi: cadence-quadspi: Add multi-chipselect support for Intel
+ LGM SoC
+
+Add multiple chipselect support for Intel LGM SoCs,
+currently QSPI-NOR and QSPI-NAND supported.
+
+Signed-off-by: Ramuthevar Vadivel Murugan <vadivel.muruganx.ramuthevar@linux.intel.com>
+Link: https://lore.kernel.org/r/20201124041840.31066-4-vadivel.muruganx.ramuthevar@linux.intel.com
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ drivers/spi/spi-cadence-quadspi.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/spi/spi-cadence-quadspi.c b/drivers/spi/spi-cadence-quadspi.c
+index 3f64275a3140..b07fffe8716e 100644
+--- a/drivers/spi/spi-cadence-quadspi.c
++++ b/drivers/spi/spi-cadence-quadspi.c
+@@ -88,6 +88,7 @@ struct cqspi_st {
+ 	bool			is_decoded_cs;
+ 	u32			fifo_depth;
+ 	u32			fifo_width;
++	u32			num_chipselect;
+ 	bool			rclk_en;
+ 	u32			trigger_address;
+ 	u32			wr_delay;
+@@ -2169,6 +2170,9 @@ static int cqspi_of_get_pdata(struct cqspi_st *cqspi)
+ 		return -ENXIO;
+ 	}
+ 
++	if (of_property_read_u32(np, "num-cs", &cqspi->num_chipselect))
++		cqspi->num_chipselect = CQSPI_MAX_CHIPSELECT;
++
+ 	cqspi->rclk_en = of_property_read_bool(np, "cdns,rclk-en");
+ 
+ 	return 0;
+@@ -2410,6 +2414,8 @@ static int cqspi_probe(struct platform_device *pdev)
+ 	cqspi->current_cs = -1;
+ 	cqspi->sclk = 0;
+ 
++	master->num_chipselect = cqspi->num_chipselect;
++
+ 	ret = cqspi_setup_flash(cqspi);
+ 	if (ret) {
+ 		dev_err(dev, "failed to setup flash parameters %d\n", ret);
+-- 
+2.17.1
+
